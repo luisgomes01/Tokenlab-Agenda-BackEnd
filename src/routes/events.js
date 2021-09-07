@@ -8,11 +8,11 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const { startEvent, endEvent, description, user_id } = req.body;
-    if (!startEvent||!endEvent||!description||!user_id) {
+    const { date, start, end, description, user_id } = req.body;
+    if (!date||!start||!end||!description||!user_id) {
         return res.status(400).json({message: 'There are a few fields missing.'})
     }
-    const [id] = await knex('event').insert({startEvent, endEvent, description, user_id});
+    const [id] = await knex('event').insert({ date, start, end, description, user_id});
     const event = await knex('event').where('id', id). first();
     return res.json(event);
 });
@@ -25,17 +25,18 @@ router.get('/user/:user_id', async (req, res) => {
 
 router.get('/day/:date', async (req, res) => {
     const {date} = req.params;
-    const startEvent = date + "T00:00:00Z"
-    const endEvent = date + "T23:59:59Z"
-    const events = await knex('event').where('startEvent', ">=", startEvent).where('startEvent', "<=", endEvent)
+    const events = await knex('event').where('date', date);
     return res.json(events)
 })
 
 router.put('/:id', async (req, res) => {
-    const {startEvent, endEvent, description, user_id} = req.body
+    const { date, start, end, description, user_id } = req.body;
+    if (!date||!start||!end||!description||!user_id) {
+        return res.status(400).json({message: 'There are a few fields missing.'})
+    }
     const {id} = req.params
 
-    await knex('event').where('id', id).update({startEvent, endEvent, description, user_id})
+    await knex('event').where('id', id).update({date, start, end, description, user_id})
     const event = await knex('event').where('id', id).first();
 
     return res.json(event)
