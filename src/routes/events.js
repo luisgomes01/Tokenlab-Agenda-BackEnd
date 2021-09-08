@@ -31,10 +31,10 @@ router.get('/day/:date', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { date, start, end, description, user_id } = req.body;
-    if (!date||!start||!end||!description||!user_id) {
+    const {id} = req.params
+    if (!id) {
         return res.status(400).json({message: 'There are a few fields missing.'})
     }
-    const {id} = req.params
 
     await knex('event').where('id', id).update({date, start, end, description, user_id})
     const event = await knex('event').where('id', id).first();
